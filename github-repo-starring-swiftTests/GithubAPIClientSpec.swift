@@ -57,14 +57,14 @@ class GithubAPIClientSpec: QuickSpec {
         describe("getRepositories") {
             it("should get the proper repositories from Github") {
                 waitUntil(action: { (done) in
-                    GithubAPIClient.getRepositories(with: { (repos) in
+                    GithubAPIClient.getRepositoriesWithCompletion { (repos) in
                         
                         expect(repos).toNot(beNil())
                         expect(repos.count).to(equal(2))
 //                        expect(repos).to(equal(repositoryArray! as? [Any]))
                         done()
                         
-                    })
+                    }
                 })
             }
         }

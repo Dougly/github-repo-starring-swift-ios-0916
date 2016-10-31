@@ -11,12 +11,15 @@ import UIKit
 class ReposTableViewController: UITableViewController {
     
     let store = ReposDataStore.sharedInstance
+    let alert = UIAlertController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.tableView.accessibilityLabel = "tableView"
         self.tableView.accessibilityIdentifier = "tableView"
+        
+        
         
         store.getRepositoriesWithCompletion {
             OperationQueue.main.addOperation({ 
@@ -39,6 +42,26 @@ class ReposTableViewController: UITableViewController {
         cell.textLabel?.text = repository.fullName
 
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let selectedRepo = store.repositories[indexPath.row]
+        
+        ReposDataStore.toggleStarStatus(for: selectedRepo) { (toggleOnOff) in
+            switch toggleOnOff {
+            case true:
+                self.alert.accessibilityLabel = "You just starred \(selectedRepo.fullName)"
+                self.alert.message = "You just starred \(selectedRepo.fullName)"
+                print ("starred the repo")
+            case false:
+                self.alert.accessibilityLabel = "You just unstarred \(selectedRepo.fullName)"
+                self.alert.message = "You just unstarred \(selectedRepo.fullName)"
+                print ("unstarred the repo")
+            }
+        }
+        
+        
     }
 
 }

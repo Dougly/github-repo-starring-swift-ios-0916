@@ -10,8 +10,8 @@ import UIKit
 
 class GithubAPIClient {
     
-    class func getRepositoriesWithCompletion(_ completion: @escaping ([Any]) -> ()) {
-        let urlString = "\(githubAPIURL)/repositories?client_id=\(githubClientID)&client_secret=\(githubClientSecret)"
+    class func getRepositoriesWithCompletion(completion: @escaping ([Any]) -> ()) {
+        let urlString = "\(Secrets.githubAPIURL)/repositories?client_id=\(Secrets.githubClientID)&client_secret=\(Secrets.githubSecretID)"
         let url = URL(string: urlString)
         let session = URLSession.shared
         
@@ -28,5 +28,63 @@ class GithubAPIClient {
         task.resume()
     }
     
+    class func checkIfRepositoryIsStarred(_ fullName: String, completion: @escaping (Bool) -> Void) {
+        
+        let url = URL(string: "\(Secrets.githubAPIURL)/user/starred/\(fullName)?access_token=\(Secrets.personalAccessToken)")
+        
+        let session = URLSession.shared
+        
+        if let url = url {
+            let task = session.dataTask(with: url) { (data, response, error) in
+                let httpResponse = response as! HTTPURLResponse
+                
+                switch httpResponse.statusCode {
+                case 204: completion(true)
+                case 404: completion(false)
+                default: break
+                }
+            }
+            task.resume()
+        }
+        
+    }
+    
+    class func starRepository(_ fullName: String, completion: @escaping () -> Void) {
+        
+        let url = URL(string: "\(Secrets.githubAPIURL)/user/starred/\(fullName)?access_token=\(Secrets.personalAccessToken)")
+        
+        
+        
+        let session = URLSession.shared
+        
+        if let url = url {
+            var request = URLRequest(url: url)
+            request.httpMethod = "PUT"
+            
+            let task = session.dataTask(with: request) { (data, response, error) in
+                completion ()
+            }
+        
+            task.resume()
+        }
+        
+    }
+    
+    class func unstarRepository(_ fullName: String, comletion: @escaping () -> Void) {
+        
+        let url = URL(string: "\(Secrets.githubAPIURL)/user/starred/\(fullName)?access_token=\(Secrets.personalAccessToken)")
+        
+        let session = URLSession.shared
+        
+        if let url = url {
+            var request = URLRequest(url: url)
+            request.httpMethod = "DELETE"
+    
+            let task = session.dataTask(with: request) { (data, response, error) in
+                comletion ()
+            }
+            task.resume()
+        }
+    }
 }
 
